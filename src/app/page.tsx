@@ -4,7 +4,9 @@ import Link from 'next/link';
 export default function HomePage() {
   return (
     <div className='space-x-1'>
-      <Button>Go To Dashboard</Button>
+      <Button asChild>
+        <Link href='/dashboard'>Go to Dashboard</Link>
+      </Button>
       <Button asChild>
         <Link href='/qr'>Go To QR</Link>
       </Button>

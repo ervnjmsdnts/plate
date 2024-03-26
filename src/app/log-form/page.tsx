@@ -1,6 +1,4 @@
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import Image from 'next/image';
-import HomeOwnerForm from './_components/home-owner-form';
 import VisitorForm from './_components/visitor-form';
 
 export default function LogFormPage() {
@@ -24,18 +22,7 @@ export default function LogFormPage() {
             <h1 className='text-lg font-bold'>Log Form</h1>
             <p className='text-sm'>Please fill up the form below.</p>
           </div>
-          <Tabs defaultValue='home-owner' className='w-full'>
-            <TabsList>
-              <TabsTrigger value='home-owner'>Home Owner</TabsTrigger>
-              <TabsTrigger value='visitor'>Visitor</TabsTrigger>
-            </TabsList>
-            <TabsContent value='home-owner'>
-              <HomeOwnerForm />
-            </TabsContent>
-            <TabsContent value='visitor'>
-              <VisitorForm />
-            </TabsContent>
-          </Tabs>
+          <VisitorForm />
         </div>
       </div>
     </div>
