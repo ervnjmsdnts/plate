@@ -4,7 +4,7 @@ import VisitorForm from './_components/visitor-form';
 export default function LogFormPage() {
   return (
     <div className='h-screen w-screen flex items-center justify-center bg-primary'>
-      <div className='bg-white flex rounded-md p-4 space-x-4'>
+      <div className='bg-white flex flex-col gap-4 rounded-md p-4 space-x-4'>
         {/* Image */}
         <div className='bg-primary flex flex-col gap-4 items-center justify-center text-center rounded-md text-white p-4'>
           <div className='relative w-full h-32'>
