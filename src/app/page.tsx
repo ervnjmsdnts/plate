@@ -8,9 +8,6 @@ export default function HomePage() {
         <Link href='/dashboard'>Go to Dashboard</Link>
       </Button>
       <Button asChild>
-        <Link href='/qr'>Go To QR</Link>
-      </Button>
-      <Button asChild>
         <Link href='log-form'>Go To Log System</Link>
       </Button>
     </div>
