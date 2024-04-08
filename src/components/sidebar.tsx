@@ -6,16 +6,34 @@ import {
   BookText,
   CarFront,
   LayoutDashboard,
+  LogOut,
   QrCode,
   User,
   Users,
 } from 'lucide-react';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from './ui/dropdown-menu';
+import { signOut } from 'firebase/auth';
+import { auth } from '@/firebase';
 
 export default function Sidebar() {
-  const [isOpen, setIsOpen] = useState(false);
   const pathname = usePathname();
+
+  const router = useRouter();
+
+  const handleLogout = async () => {
+    await signOut(auth);
+
+    await fetch('/api/logout');
+
+    router.push('/');
+  };
 
   return (
     <nav className='h-full py-4 pr-2 pl-4 min-w-64 flex flex-col'>
@@ -93,17 +111,27 @@ export default function Sidebar() {
         </div>
       </div>
       {/* Avatar */}
-      <div className='bg-white p-4 hover:bg-gray-50 cursor-pointer border rounded-md'>
-        <div className='flex gap-2'>
-          <div className='flex justify-center items-center'>
-            <User className='w-5 h-5' />
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <div className='bg-white p-4 hover:bg-gray-50 cursor-pointer border rounded-md'>
+            <div className='flex gap-2'>
+              <div className='flex justify-center items-center'>
+                <User className='w-5 h-5' />
+              </div>
+              <div>
+                <p className='text-xs font-medium'>Earvin James Dantes</p>
+                <p className='text-xs truncate'>earvinjamesdantes@gmail.com</p>
+              </div>
+            </div>
           </div>
-          <div>
-            <p className='text-xs font-medium'>Earvin James Dantes</p>
-            <p className='text-xs truncate'>earvinjamesdantes@gmail.com</p>
-          </div>
-        </div>
-      </div>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent className='w-56'>
+          <DropdownMenuItem onClick={handleLogout}>
+            <LogOut className='mr-2 h-4 w-4' />
+            <span>Log out</span>
+          </DropdownMenuItem>
+        </DropdownMenuContent>
+      </DropdownMenu>
     </nav>
   );
 }
