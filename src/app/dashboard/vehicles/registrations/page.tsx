@@ -109,6 +109,8 @@ export default function VehicleRegistrationsPage() {
 
   const totalPages = Math.ceil(filteredLogs.length / itemsPerPage);
 
+  console.log('hi');
+
   return (
     <>
       <CreateVehicleForm

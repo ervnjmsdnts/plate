@@ -57,7 +57,7 @@ const schema = z.object({
   paymentStatus: z
     .string({ required_error: 'Payment status is required' })
     .min(1, { message: 'Payment status is required' }),
-  paymentDueDate: z.date({ required_error: 'Payment due date is required' }),
+  paymentDueDate: z.number({ required_error: 'Payment due date is required' }),
 });
 
 type Schema = z.infer<typeof schema>;
@@ -85,7 +85,7 @@ export default function EditVehicleForm({
 }) {
   const form = useForm<Schema>({
     resolver: zodResolver(schema),
-    values: { ...vehicle, paymentDueDate: new Date(vehicle.paymentDueDate) },
+    values: { ...vehicle },
   });
 
   const { toast } = useToast();
@@ -227,8 +227,8 @@ export default function EditVehicleForm({
                     <PopoverContent className='w-auto p-0' align='start'>
                       <Calendar
                         mode='single'
-                        selected={field.value as any}
-                        onSelect={field.onChange}
+                        selected={new Date(field.value)}
+                        onSelect={(date) => field.onChange(date?.getTime())}
                         initialFocus
                       />
                     </PopoverContent>
