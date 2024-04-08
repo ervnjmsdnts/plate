@@ -52,7 +52,7 @@ export default function HomePage() {
         },
       });
 
-      router.push('/dashboard');
+      router.refresh();
     } catch (_) {
       toast({ title: 'Invalid Credentials', variant: 'destructive' });
     } finally {
@@ -71,7 +71,11 @@ export default function HomePage() {
               render={({ field }) => (
                 <FormItem>
                   <FormControl>
-                    <Input placeholder='Email Address' {...field} />
+                    <Input
+                      placeholder='Email Address'
+                      type='email'
+                      {...field}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -89,7 +93,7 @@ export default function HomePage() {
                 </FormItem>
               )}
             />
-            <Button className='w-full' type='submit'>
+            <Button className='w-full' disabled={isLoading} type='submit'>
               {isLoading ? (
                 <>
                   <Loader2 className='animate-spin h-4 w-4 mr-2' /> Logging In

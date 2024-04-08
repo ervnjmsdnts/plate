@@ -1,7 +1,6 @@
 'use client';
 import { Button } from '@/components/ui/button';
 import Image from 'next/image';
-import { useState } from 'react';
 import {
   BookText,
   CarFront,
@@ -21,8 +20,9 @@ import {
 } from './ui/dropdown-menu';
 import { signOut } from 'firebase/auth';
 import { auth } from '@/firebase';
+import { UserType } from '@/app/dashboard/types';
 
-export default function Sidebar() {
+export default function Sidebar({ name, email, role }: UserType) {
   const pathname = usePathname();
 
   const router = useRouter();
@@ -34,6 +34,8 @@ export default function Sidebar() {
 
     router.push('/');
   };
+
+  console.log({ name, email, role });
 
   return (
     <nav className='h-full py-4 pr-2 pl-4 min-w-64 flex flex-col'>
@@ -52,14 +54,16 @@ export default function Sidebar() {
               <LayoutDashboard className='mr-2 h-4 w-4' /> Dashboard
             </Link>
           </Button>
-          <Button
-            className='justify-start'
-            asChild
-            variant={pathname === '/dashboard/users' ? 'outline' : 'ghost'}>
-            <Link href='/dashboard/users'>
-              <Users className='mr-2 h-4 w-4' /> Users
-            </Link>
-          </Button>
+          {role === 'ADMIN' && (
+            <Button
+              className='justify-start'
+              asChild
+              variant={pathname === '/dashboard/users' ? 'outline' : 'ghost'}>
+              <Link href='/dashboard/users'>
+                <Users className='mr-2 h-4 w-4' /> Users
+              </Link>
+            </Button>
+          )}
           <p className='text-xs pl-1 py-3 font-medium text-gray-400 uppercase'>
             Vehicles
           </p>
@@ -73,18 +77,20 @@ export default function Sidebar() {
               <BookText className='mr-2 h-4 w-4' /> Logs
             </Link>
           </Button>
-          <Button
-            className='justify-start'
-            asChild
-            variant={
-              pathname === '/dashboard/vehicles/registrations'
-                ? 'outline'
-                : 'ghost'
-            }>
-            <Link href='/dashboard/vehicles/registrations'>
-              <CarFront className='mr-2 h-4 w-4' /> Registrations
-            </Link>
-          </Button>
+          {role === 'ADMIN' && (
+            <Button
+              className='justify-start'
+              asChild
+              variant={
+                pathname === '/dashboard/vehicles/registrations'
+                  ? 'outline'
+                  : 'ghost'
+              }>
+              <Link href='/dashboard/vehicles/registrations'>
+                <CarFront className='mr-2 h-4 w-4' /> Registrations
+              </Link>
+            </Button>
+          )}
           <p className='text-xs pl-1 py-3 font-medium text-gray-400 uppercase'>
             Visitors
           </p>
@@ -98,16 +104,18 @@ export default function Sidebar() {
               <BookText className='mr-2 h-4 w-4' /> Logs
             </Link>
           </Button>
-          <Button
-            className='justify-start w-full'
-            asChild
-            variant={
-              pathname === '/dashboard/visitors/qr-scan' ? 'outline' : 'ghost'
-            }>
-            <Link href='/dashboard/visitors/qr-scan'>
-              <QrCode className='mr-2 h-4 w-4' /> QR Scan
-            </Link>
-          </Button>
+          {role === 'GUARD' && (
+            <Button
+              className='justify-start w-full'
+              asChild
+              variant={
+                pathname === '/dashboard/visitors/qr-scan' ? 'outline' : 'ghost'
+              }>
+              <Link href='/dashboard/visitors/qr-scan'>
+                <QrCode className='mr-2 h-4 w-4' /> QR Scan
+              </Link>
+            </Button>
+          )}
         </div>
       </div>
       {/* Avatar */}
@@ -119,8 +127,8 @@ export default function Sidebar() {
                 <User className='w-5 h-5' />
               </div>
               <div>
-                <p className='text-xs font-medium'>Earvin James Dantes</p>
-                <p className='text-xs truncate'>earvinjamesdantes@gmail.com</p>
+                <p className='text-xs font-medium'>{name}</p>
+                <p className='text-xs truncate'>{email}</p>
               </div>
             </div>
           </div>
