@@ -33,6 +33,13 @@ import { db } from '@/firebase';
 import { useToast } from '@/components/ui/use-toast';
 import { format } from 'date-fns';
 import { useEffect, useState } from 'react';
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from '@/components/ui/popover';
+import { CalendarIcon } from 'lucide-react';
+import { Calendar } from '@/components/ui/calendar';
 
 const schema = z.object({
   name: z
@@ -50,6 +57,7 @@ const schema = z.object({
   paymentStatus: z
     .string({ required_error: 'Payment status is required' })
     .min(1, { message: 'Payment status is required' }),
+  paymentDueDate: z.date({ required_error: 'Payment due date is required' }),
 });
 
 type Schema = z.infer<typeof schema>;
@@ -75,19 +83,12 @@ export default function EditVehicleForm({
   onClose: () => void;
   vehicle: RegisteredVehiclesType;
 }) {
-  const [paymentDueDate, setPaymentDueDate] = useState(0);
   const form = useForm<Schema>({
     resolver: zodResolver(schema),
-    values: { ...vehicle },
+    values: { ...vehicle, paymentDueDate: new Date(vehicle.paymentDueDate) },
   });
 
   const { toast } = useToast();
-
-  useEffect(() => {
-    if (vehicle.paymentDueDate) {
-      setPaymentDueDate(vehicle.paymentDueDate);
-    }
-  }, [vehicle.paymentDueDate]);
 
   const onSubmit = async (data: Schema) => {
     try {
@@ -95,7 +96,7 @@ export default function EditVehicleForm({
         ['/Registered Vehicles/' + vehicle.id]: {
           ...vehicle,
           ...data,
-          paymentDueDate,
+          paymentDueDate: new Date(data.paymentDueDate).getTime(),
           id: null,
         },
       });
@@ -104,12 +105,6 @@ export default function EditVehicleForm({
     } catch (_) {
       toast({ title: 'Error editing vehicle', variant: 'destructive' });
     }
-  };
-
-  const setNewDueDate = () => {
-    const date = new Date(paymentDueDate);
-    date.setMonth(date.getMonth() + 1);
-    setPaymentDueDate(date.getTime());
   };
 
   return (
@@ -206,20 +201,42 @@ export default function EditVehicleForm({
                 </FormItem>
               )}
             />
-            {paymentDueDate && (
-              <div className='flex gap-2 items-center'>
-                <p className='text-sm'>
-                  Payment Due Date: {format(paymentDueDate, 'P')}
-                </p>
-                <Button
-                  type='button'
-                  onClick={setNewDueDate}
-                  size='sm'
-                  variant='secondary'>
-                  New Due Date
-                </Button>
-              </div>
-            )}
+            <FormField
+              control={form.control}
+              name='paymentDueDate'
+              render={({ field }) => (
+                <FormItem className='flex flex-col'>
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <FormControl>
+                        <Button
+                          variant={'outline'}
+                          className={cn(
+                            'pl-3 text-left font-normal',
+                            !field.value && 'text-muted-foreground',
+                          )}>
+                          {field.value ? (
+                            format(field.value, 'PPP')
+                          ) : (
+                            <span>Pick a date</span>
+                          )}
+                          <CalendarIcon className='ml-auto h-4 w-4 opacity-50' />
+                        </Button>
+                      </FormControl>
+                    </PopoverTrigger>
+                    <PopoverContent className='w-auto p-0' align='start'>
+                      <Calendar
+                        mode='single'
+                        selected={field.value as any}
+                        onSelect={field.onChange}
+                        initialFocus
+                      />
+                    </PopoverContent>
+                  </Popover>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
             <DialogFooter>
               <DialogClose asChild>
                 <Button type='button' variant='outline'>

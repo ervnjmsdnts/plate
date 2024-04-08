@@ -35,8 +35,6 @@ export default function Sidebar({ name, email, role }: UserType) {
     router.push('/');
   };
 
-  console.log({ name, email, role });
-
   return (
     <nav className='h-full py-4 pr-2 pl-4 min-w-64 flex flex-col'>
       <div className='flex-grow'>

@@ -21,11 +21,23 @@ import {
 import { useState } from 'react';
 import QRCode from 'qrcode';
 import Image from 'next/image';
+import { Textarea } from '@/components/ui/textarea';
+import { v4 as uuidv4 } from 'uuid';
 
 const schema = z.object({
-  name: z.string().min(1, { message: 'Full name is required' }),
-  address: z.string().min(1, { message: 'Address is required' }),
-  contactNum: z.string().min(1, { message: 'Contact Number is required' }),
+  name: z
+    .string({ required_error: 'Full name is required' })
+    .min(1, { message: 'Field is required' }),
+  address: z
+    .string({ required_error: 'Address is required' })
+    .min(1, { message: 'Field is required' }),
+  contactNum: z
+    .string({ required_error: 'Contact number is required' })
+    .min(1, { message: 'Field is required' }),
+  homeOwnerToVisit: z
+    .string({ required_error: 'Homeowner to visit is required' })
+    .min(1, 'Field is required'),
+  purposeOfVisit: z.string().optional(),
 });
 
 type Schema = z.infer<typeof schema>;
@@ -39,7 +51,11 @@ export default function VisitorForm() {
     const currentDate = new Date();
     currentDate.setDate(currentDate.getDate() + 5);
     QRCode.toDataURL(
-      JSON.stringify({ ...data, expirationTime: currentDate.getTime() }),
+      JSON.stringify({
+        ...data,
+        expirationTime: currentDate.getTime(),
+        qrId: uuidv4(),
+      }),
     ).then(setQrData);
     setOpen(true);
   };
@@ -59,43 +75,76 @@ export default function VisitorForm() {
         </DialogContent>
       </Dialog>
       <Form {...form}>
-        <form onSubmit={form.handleSubmit(onSubmit)} className='space-y-2'>
-          <FormField
-            control={form.control}
-            name='name'
-            render={({ field }) => (
-              <FormItem>
-                <FormControl>
-                  <Input placeholder='Full Name' {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <FormField
-            control={form.control}
-            name='address'
-            render={({ field }) => (
-              <FormItem>
-                <FormControl>
-                  <Input placeholder='Address' {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <FormField
-            control={form.control}
-            name='contactNum'
-            render={({ field }) => (
-              <FormItem>
-                <FormControl>
-                  <Input placeholder='Contact Number' {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+        <form onSubmit={form.handleSubmit(onSubmit)}>
+          <div className='flex gap-2 pb-2'>
+            <div className='space-y-2'>
+              <FormField
+                control={form.control}
+                name='name'
+                render={({ field }) => (
+                  <FormItem>
+                    <FormControl>
+                      <Input placeholder='Full name' {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name='address'
+                render={({ field }) => (
+                  <FormItem>
+                    <FormControl>
+                      <Input placeholder='Address' {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name='contactNum'
+                render={({ field }) => (
+                  <FormItem>
+                    <FormControl>
+                      <Input placeholder='Contact number' {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name='homeOwnerToVisit'
+                render={({ field }) => (
+                  <FormItem>
+                    <FormControl>
+                      <Input placeholder='Homeowner to visit' {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
+            <FormField
+              control={form.control}
+              name='purposeOfVisit'
+              render={({ field }) => (
+                <FormItem>
+                  <FormControl>
+                    <Textarea
+                      placeholder='Purpose of visit'
+                      className='h-full'
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </div>
+
           <Button className='w-full' type='submit'>
             Submit
           </Button>

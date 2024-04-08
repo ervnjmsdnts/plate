@@ -13,12 +13,21 @@ import {
 import { db } from '@/firebase';
 
 import { onValue, ref } from 'firebase/database';
-import { Edit2, Loader2, Trash2 } from 'lucide-react';
+import {
+  ChevronLeft,
+  ChevronRight,
+  ChevronsLeft,
+  ChevronsRight,
+  Edit2,
+  Loader2,
+  Trash2,
+} from 'lucide-react';
 import { useEffect, useMemo, useState } from 'react';
 import CreateVehicleForm from './_components/create-vehicle-form';
 import { format } from 'date-fns';
 import EditVehicleForm from './_components/edit-vehicle-form';
 import DeleteVehicle from './_components/delete-vehicle';
+import { Input } from '@/components/ui/input';
 
 interface RegisteredVehiclesType {
   id: string;
@@ -46,7 +55,9 @@ export default function VehicleRegistrationsPage() {
   const [selectedDeleteVehicle, setSelectedDeleteVehicle] = useState(
     {} as RegisteredVehiclesType,
   );
-
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(8); // Adjust as needed
+  const [searchTerm, setSearchTerm] = useState('');
   useEffect(() => {
     const query = ref(db, 'Registered Vehicles');
     const unsubscribe = onValue(query, (snapshot) => {
@@ -57,7 +68,10 @@ export default function VehicleRegistrationsPage() {
           id,
           ...vehicles,
         }));
-        setRegisteredVehicles(vehiclesWithIds);
+        const sortedLogs = vehiclesWithIds
+          .slice()
+          .sort((a, b) => a.name.localeCompare(b.name));
+        setRegisteredVehicles(sortedLogs);
       }
       setLoading(false);
     });
@@ -82,6 +96,19 @@ export default function VehicleRegistrationsPage() {
     setOpenDelete(true);
   };
 
+  // Logic to paginate data
+  const indexOfLastItem = currentPage * itemsPerPage;
+  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+  const filteredLogs = activeVehicles.filter((log) =>
+    log.name.toLowerCase().includes(searchTerm.toLowerCase()),
+  );
+  const currentItems = filteredLogs.slice(indexOfFirstItem, indexOfLastItem);
+
+  // Change page
+  const paginate = (pageNumber: number) => setCurrentPage(pageNumber);
+
+  const totalPages = Math.ceil(filteredLogs.length / itemsPerPage);
+
   return (
     <>
       <CreateVehicleForm
@@ -98,55 +125,109 @@ export default function VehicleRegistrationsPage() {
         onClose={() => setOpenDelete(false)}
         vehicle={selectedDeleteVehicle}
       />
-      <div className='space-y-2'>
-        <div className='flex justify-end'>
-          <Button onClick={() => setOpenCreate(true)}>Register New Car</Button>
-        </div>
+      <div className='w-full h-full'>
         {loading ? (
           <div className='flex justify-center items-center h-full'>
             <Loader2 className='animate-spin h-8 w-8' />
           </div>
         ) : (
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Full Name</TableHead>
-                <TableHead>Plate Number</TableHead>
-                <TableHead>Category</TableHead>
-                <TableHead>Payment Name</TableHead>
-                <TableHead>Payment Status</TableHead>
-                <TableHead>Payment Due Date</TableHead>
-                <TableHead>Date Registered</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {activeVehicles.map((vehicle) => (
-                <TableRow key={vehicle.id}>
-                  <TableCell className='font-medium'>{vehicle.name}</TableCell>
-                  <TableCell>{vehicle.plateNumber}</TableCell>
-                  <TableCell>{vehicle.category}</TableCell>
-                  <TableCell>{vehicle.paymentName}</TableCell>
-                  <TableCell>{vehicle.paymentStatus}</TableCell>
-                  <TableCell>{format(vehicle.paymentDueDate, 'P')}</TableCell>
-                  <TableCell>{format(vehicle.dateRegistered, 'P')}</TableCell>
-                  <TableCell className='space-x-2'>
-                    <Button
-                      onClick={() => selectEditVehicle(vehicle)}
-                      size='icon'
-                      variant='outline'>
-                      <Edit2 className='w-4 h-4' />
-                    </Button>
-                    <Button
-                      onClick={() => selectDeleteVehicle(vehicle)}
-                      size='icon'
-                      variant='destructive'>
-                      <Trash2 className='w-4 h-4' />
-                    </Button>
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
+          <div className='w-full h-full flex flex-col gap-2'>
+            <div className='flex justify-between'>
+              <Input
+                placeholder='Search by name'
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className='max-w-[340px]'
+              />
+              <Button onClick={() => setOpenCreate(true)}>
+                Register New Car
+              </Button>
+            </div>
+            <div className='flex-grow'>
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Full Name</TableHead>
+                    <TableHead>Plate Number</TableHead>
+                    <TableHead>Category</TableHead>
+                    <TableHead>Payment Name</TableHead>
+                    <TableHead>Payment Status</TableHead>
+                    <TableHead>Payment Due Date</TableHead>
+                    <TableHead>Date Registered</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {currentItems.map((vehicle) => (
+                    <TableRow key={vehicle.id}>
+                      <TableCell className='font-medium'>
+                        {vehicle.name}
+                      </TableCell>
+                      <TableCell>{vehicle.plateNumber}</TableCell>
+                      <TableCell>{vehicle.category}</TableCell>
+                      <TableCell>{vehicle.paymentName}</TableCell>
+                      <TableCell>{vehicle.paymentStatus}</TableCell>
+                      <TableCell>
+                        {format(vehicle.paymentDueDate, 'P')}
+                      </TableCell>
+                      <TableCell>
+                        {format(vehicle.dateRegistered, 'P')}
+                      </TableCell>
+                      <TableCell className='space-x-2'>
+                        <Button
+                          onClick={() => selectEditVehicle(vehicle)}
+                          size='icon'
+                          variant='outline'>
+                          <Edit2 className='w-4 h-4' />
+                        </Button>
+                        <Button
+                          onClick={() => selectDeleteVehicle(vehicle)}
+                          size='icon'
+                          variant='destructive'>
+                          <Trash2 className='w-4 h-4' />
+                        </Button>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </div>
+            {/* Pagination */}
+            <div className='flex justify-end items-center gap-8'>
+              <span className='text-sm'>
+                Page {currentPage} of {totalPages}
+              </span>
+              <div className='flex justify-end items-center gap-2'>
+                <Button
+                  disabled={currentPage === 1}
+                  variant='outline'
+                  onClick={() => paginate(1)}
+                  size='icon'>
+                  <ChevronsLeft className='w-4 h-4' />
+                </Button>
+                <Button
+                  disabled={currentPage === 1}
+                  variant='outline'
+                  onClick={() => paginate(currentPage - 1)}
+                  size='icon'>
+                  <ChevronLeft className='w-4 h-4' />
+                </Button>
+                <Button
+                  disabled={currentPage === totalPages || totalPages === 0}
+                  variant='outline'
+                  onClick={() => paginate(currentPage + 1)}
+                  size='icon'>
+                  <ChevronRight className='w-4 h-4' />
+                </Button>
+                <Button
+                  disabled={currentPage === totalPages || totalPages === 0}
+                  variant='outline'
+                  onClick={() => paginate(totalPages)}
+                  size='icon'>
+                  <ChevronsRight className='w-4 h-4' />
+                </Button>
+              </div>
+            </div>
+          </div>
         )}
       </div>
     </>

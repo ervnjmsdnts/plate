@@ -32,6 +32,14 @@ import { ref, set } from 'firebase/database';
 import { db } from '@/firebase';
 import { v4 as uuidv4 } from 'uuid';
 import { useToast } from '@/components/ui/use-toast';
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from '@/components/ui/popover';
+import { format } from 'date-fns';
+import { CalendarIcon } from 'lucide-react';
+import { Calendar } from '@/components/ui/calendar';
 
 const schema = z.object({
   name: z
@@ -49,6 +57,7 @@ const schema = z.object({
   paymentStatus: z
     .string({ required_error: 'Payment status is required' })
     .min(1, { message: 'Payment status is required' }),
+  paymentDueDate: z.date({ required_error: 'Payment due date is required' }),
 });
 
 type Schema = z.infer<typeof schema>;
@@ -73,8 +82,16 @@ export default function CreateVehicleForm({
       await set(ref(db, 'Registered Vehicles/' + uuidv4()), {
         ...data,
         dateRegistered: new Date().getTime(),
-        paymentDueDate: currentDate.getTime(),
+        paymentDueDate: data.paymentDueDate.getTime(),
         isActive: true,
+      });
+      form.reset({
+        category: '',
+        name: '',
+        paymentDueDate: undefined,
+        paymentName: '',
+        paymentStatus: '',
+        plateNumber: '',
       });
       onClose();
       toast({ title: 'Vehicle has been registered successfully' });
@@ -176,9 +193,57 @@ export default function CreateVehicleForm({
                 </FormItem>
               )}
             />
+            <FormField
+              control={form.control}
+              name='paymentDueDate'
+              render={({ field }) => (
+                <FormItem className='flex flex-col'>
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <FormControl>
+                        <Button
+                          variant={'outline'}
+                          className={cn(
+                            'pl-3 text-left font-normal',
+                            !field.value && 'text-muted-foreground',
+                          )}>
+                          {field.value ? (
+                            format(field.value, 'PPP')
+                          ) : (
+                            <span>Pick a date</span>
+                          )}
+                          <CalendarIcon className='ml-auto h-4 w-4 opacity-50' />
+                        </Button>
+                      </FormControl>
+                    </PopoverTrigger>
+                    <PopoverContent className='w-auto p-0' align='start'>
+                      <Calendar
+                        mode='single'
+                        selected={field.value as any}
+                        onSelect={field.onChange}
+                        initialFocus
+                      />
+                    </PopoverContent>
+                  </Popover>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
             <DialogFooter>
               <DialogClose asChild>
-                <Button type='button' variant='outline'>
+                <Button
+                  onClick={() =>
+                    form.reset({
+                      category: '',
+                      name: '',
+                      paymentDueDate: undefined,
+                      paymentName: '',
+                      paymentStatus: '',
+                      plateNumber: '',
+                    })
+                  }
+                  type='button'
+                  variant='outline'>
                   Cancel
                 </Button>
               </DialogClose>

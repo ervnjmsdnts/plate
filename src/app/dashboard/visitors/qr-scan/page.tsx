@@ -9,18 +9,22 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
+import { Label } from '@/components/ui/label';
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { useToast } from '@/components/ui/use-toast';
 import { db } from '@/firebase';
-import { ref, set } from 'firebase/database';
+import { child, get, ref, set, update } from 'firebase/database';
 import { Html5Qrcode } from 'html5-qrcode';
 import { useEffect, useState } from 'react';
-import { v4 as uuidv4 } from 'uuid';
 
 interface ResultsType {
   name: string;
   address: string;
   contactNum: string;
+  homeOwnerToVisit: string;
+  purposeOfVisit: string;
   expirationTime: number;
+  qrId: string;
 }
 
 export default function QRScanPage() {
@@ -28,6 +32,7 @@ export default function QRScanPage() {
   const [openError, setOpenError] = useState(false);
   const [openSuccess, setOpenSuccess] = useState(false);
   const [results, setResults] = useState({} as ResultsType);
+  const [timeType, setTimeType] = useState('');
 
   const { toast } = useToast();
 
@@ -62,13 +67,32 @@ export default function QRScanPage() {
 
   const writeVisitorLog = async () => {
     try {
-      await set(ref(db, 'Visitor Logs/' + uuidv4()), {
-        name: results.name,
-        address: results.address,
-        contactNumber: results.contactNum,
-        type: 'IN',
-        timestamp: new Date().getTime(),
-      });
+      if (timeType === 'TIMEOUT') {
+        const logSnapshot = await get(
+          child(ref(db), `Visitor Logs/${results.qrId}`),
+        );
+        if (logSnapshot.exists()) {
+          const existingsLogData = logSnapshot.val();
+          await update(ref(db), {
+            [`Visitor Logs/${results.qrId}`]: {
+              ...existingsLogData,
+              timeOut: new Date().getTime(),
+            },
+          });
+        } else {
+          toast({ title: 'Log data does not exist', variant: 'destructive' });
+          return;
+        }
+      } else {
+        await set(ref(db, `Visitor Logs/${results.qrId}`), {
+          name: results.name,
+          address: results.address,
+          contactNumber: results.contactNum,
+          homeOwnerToVisit: results.homeOwnerToVisit,
+          purposeOfVisit: results.purposeOfVisit,
+          timeIn: new Date().getTime(),
+        });
+      }
       setOpenSuccess(false);
       toast({ title: 'Visitor log has been successfully recorded' });
     } catch (_) {
@@ -83,15 +107,28 @@ export default function QRScanPage() {
           <DialogHeader>
             <DialogTitle>Success: QR Code Scanned</DialogTitle>
           </DialogHeader>
-          <div>
+          <div className='flex flex-col gap-2'>
             <p>
               QR code successfully scanned and processed. Information extracted:
             </p>
-            <ul className='list-disc ml-5 pt-2'>
+            <ul className='list-disc ml-5'>
               <li>Name: {results.name}</li>
               <li>Address: {results.address}</li>
               <li>Contact Number: {results.contactNum}</li>
             </ul>
+            <RadioGroup
+              onValueChange={(value) => setTimeType(value)}
+              value={timeType}
+              className='flex'>
+              <div className='flex items-center space-x-2'>
+                <RadioGroupItem value='TIMEIN' id='TIMEIN' />
+                <Label htmlFor='TIMEIN'>Time In</Label>
+              </div>
+              <div className='flex items-center space-x-2'>
+                <RadioGroupItem value='TIMEOUT' id='TIMEOUT' />
+                <Label htmlFor='TIMEOUT'>Time Out</Label>
+              </div>
+            </RadioGroup>
           </div>
           <DialogFooter>
             <DialogClose asChild>

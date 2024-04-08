@@ -7,7 +7,7 @@ export default function LogFormPage() {
       <div className='bg-white flex flex-col gap-4 rounded-md p-4 space-x-4'>
         {/* Image */}
         <div className='bg-primary flex flex-col gap-4 items-center justify-center text-center rounded-md text-white p-4'>
-          <div className='relative w-full h-32'>
+          <div className='relative w-full h-40'>
             <Image src='/log-image.png' fill alt='Log' />
           </div>
           <h2 className='font-bold text-2xl'>Welcome!</h2>
