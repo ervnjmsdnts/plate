@@ -65,6 +65,7 @@ export default function QRScanPage() {
     }
   }, [scan]);
 
+  // ? Possible to change logic, to where it save and update on both timeIn and timeOut based on which data is empty
   const writeVisitorLog = async () => {
     try {
       if (timeType === 'TIMEOUT') {

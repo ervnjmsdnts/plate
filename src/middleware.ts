@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { authMiddleware, redirectToLogin } from 'next-firebase-auth-edge';
 import { clientConfig, serverConfig } from './config';
 
-const PUBLIC_PATHS = ['/'];
+const PUBLIC_PATHS = ['/', '/log-form'];
 
 export async function middleware(request: NextRequest) {
   return authMiddleware(request, {
