@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import {
   Table,
   TableBody,
@@ -23,6 +23,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import DateRangePicker from '@/components/date-range-picker';
 import { DateRange } from 'react-day-picker';
+import { CSVLink } from 'react-csv';
 
 interface VisitorLogsType {
   address: string;
@@ -100,6 +101,20 @@ export default function VisitorsLogsPage() {
 
   const totalPages = Math.ceil(filteredLogs.length / itemsPerPage);
 
+  const csvData = useMemo(
+    () =>
+      currentItems?.map((item) => ({
+        'Time In': format(item.timeIn ?? new Date(), 'Ppp'),
+        'Time Out': format(item.timeOut ?? new Date(), 'Ppp'),
+        'Name of Visitor': item.name,
+        Address: item.address,
+        'Contact Number': item.contactNumber,
+        'Homeowner to Visit': item.homeOwnerToVisit,
+        'Purpose of Visit': item.purposeOfVisit,
+      })),
+    [currentItems],
+  );
+
   return (
     <div className='w-full h-full'>
       {loading ? (
@@ -108,23 +123,30 @@ export default function VisitorsLogsPage() {
         </div>
       ) : (
         <div className='flex flex-col w-full h-full gap-2'>
-          <div className='flex items-center gap-4'>
-            <Input
-              placeholder='Search by name'
-              className='max-w-[340px]'
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-            />
-            <DateRangePicker
-              placeholder='Pick a time in date'
-              date={timeInDate}
-              setDate={setTimeInDate}
-            />
-            <DateRangePicker
-              placeholder='Pick a time out date'
-              date={timeOutDate}
-              setDate={setTimeOutDate}
-            />
+          <div className='flex items-center justify-between'>
+            <div className='flex items-center gap-4'>
+              <Input
+                placeholder='Search by name'
+                className='max-w-[340px]'
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+              />
+              <DateRangePicker
+                placeholder='Pick a time in date'
+                date={timeInDate}
+                setDate={setTimeInDate}
+              />
+              <DateRangePicker
+                placeholder='Pick a time out date'
+                date={timeOutDate}
+                setDate={setTimeOutDate}
+              />
+            </div>
+            <Button asChild>
+              <CSVLink data={csvData} filename='visitor-logs.csv'>
+                Export CSV
+              </CSVLink>
+            </Button>
           </div>
           <div className='flex-grow'>
             <Table>
