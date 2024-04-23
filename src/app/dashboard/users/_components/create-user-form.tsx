@@ -100,7 +100,7 @@ export default function CreateUserForm({
     } catch (error) {
       toast({ title: (error as Error).message, variant: 'destructive' });
     } finally {
-      setLoading(true);
+      setLoading(false);
     }
   };
   return (

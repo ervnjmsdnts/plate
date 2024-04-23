@@ -14,6 +14,7 @@ import { auth } from '@/firebase';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { signInWithEmailAndPassword } from 'firebase/auth';
 import { Loader2 } from 'lucide-react';
+import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
@@ -63,6 +64,11 @@ export default function HomePage() {
   return (
     <div className='h-screen w-screen flex items-center justify-center bg-primary'>
       <div className='bg-white flex flex-col gap-4 rounded-md p-4'>
+        <div className='flex items-center justify-center'>
+          <div className='relative w-24 h-24'>
+            <Image src='/logo-vmos.png' alt='Logo' layout='fill' />
+          </div>
+        </div>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className='space-y-2'>
             <FormField
