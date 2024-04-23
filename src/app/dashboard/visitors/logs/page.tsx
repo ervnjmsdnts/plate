@@ -104,8 +104,8 @@ export default function VisitorsLogsPage() {
   const csvData = useMemo(
     () =>
       currentItems?.map((item) => ({
-        'Time In': format(item.timeIn ?? new Date(), 'Ppp'),
-        'Time Out': format(item.timeOut ?? new Date(), 'Ppp'),
+        'Time In': item.timeIn ? format(item.timeIn, 'Ppp') : '',
+        'Time Out': item.timeOut ? format(item.timeOut, 'Ppp') : '',
         'Name of Visitor': item.name,
         Address: item.address,
         'Contact Number': item.contactNumber,
