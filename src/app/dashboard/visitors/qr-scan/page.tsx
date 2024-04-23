@@ -163,15 +163,15 @@ export default function QRScanPage() {
       </Dialog>
       <main className='flex items-center h-full justify-center'>
         <div className='space-y-6'>
-          <div className='relative w-64 h-64'>
+          <div className='relative w-80 h-80'>
             <div className='absolute z-20 border-t-4 border-l-4 border-primary w-14 h-14 -top-3 -left-3'></div>
             <div className='absolute z-20 border-t-4 border-r-4 border-primary w-14 h-14 -top-3 -right-3'></div>
             <div className='absolute z-20 border-b-4 border-l-4 border-primary w-14 h-14 -bottom-3 -left-3'></div>
             <div className='absolute z-20 border-b-4 border-r-4 border-primary w-14 h-14 -bottom-3 -right-3'></div>
             {scan ? (
-              <div className='w-64 h-64' id='reader' />
+              <div className='w-80 h-80' id='reader' />
             ) : (
-              <div className='w-64 h-64 bg-secondary' />
+              <div className='w-80 h-80 bg-secondary' />
             )}
           </div>
           <Button size='lg' className='w-full' onClick={() => setScan(true)}>
