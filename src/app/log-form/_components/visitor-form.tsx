@@ -49,7 +49,7 @@ export default function VisitorForm() {
 
   const onSubmit = (data: Schema) => {
     const currentDate = new Date();
-    currentDate.setDate(currentDate.getDate() + 5);
+    currentDate.setDate(currentDate.getFullYear() + 1);
     QRCode.toDataURL(
       JSON.stringify({
         ...data,
