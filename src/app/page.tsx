@@ -77,7 +77,10 @@ export default function HomePage() {
 
       const userData = user.val() as UserType;
 
-      localStorage.setItem('role', userData.role);
+      localStorage.setItem(
+        'user',
+        JSON.stringify({ role: userData.role, id: tokenData.user_id }),
+      );
 
       router.refresh();
     } catch (_) {

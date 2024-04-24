@@ -96,6 +96,8 @@ export default function UserPage() {
     setOpenDelete(true);
   };
 
+  const { id } = JSON.parse(localStorage.getItem('user') || '{}');
+
   return (
     <>
       <CreateUserForm open={openCreate} onClose={() => setOpenCreate(false)} />
@@ -147,12 +149,14 @@ export default function UserPage() {
 
                       <TableCell className='space-x-2'>
                         <Button
+                          disabled={user.id === id}
                           size='icon'
                           variant='outline'
                           onClick={() => selectEditUser(user)}>
                           <Edit2 className='w-4 h-4' />
                         </Button>
                         <Button
+                          disabled={user.id === id}
                           onClick={() => selectDeleteUser(user)}
                           size='icon'
                           variant='destructive'>

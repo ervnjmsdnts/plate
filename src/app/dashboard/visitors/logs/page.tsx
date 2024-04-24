@@ -51,7 +51,7 @@ export default function VisitorsLogsPage() {
     to: undefined,
   });
 
-  const role = localStorage.getItem('role');
+  const { role } = JSON.parse(localStorage.getItem('user') || '{}');
 
   useEffect(() => {
     const query = ref(db, 'Visitor Logs');

@@ -29,7 +29,7 @@ export default function Sidebar({ name, email, role }: UserType) {
   const router = useRouter();
 
   const handleLogout = async () => {
-    localStorage.removeItem('role');
+    localStorage.removeItem('user');
     await signOut(auth);
 
     await fetch('/api/logout');
