@@ -105,7 +105,7 @@ export default function VisitorsLogsPage() {
 
   const csvData = useMemo(
     () =>
-      currentItems?.map((item) => ({
+      filteredLogs?.map((item) => ({
         'Time In': item.timeIn ? format(item.timeIn, 'Ppp') : '',
         'Time Out': item.timeOut ? format(item.timeOut, 'Ppp') : '',
         'Name of Visitor': item.name,
@@ -114,7 +114,7 @@ export default function VisitorsLogsPage() {
         'Homeowner to Visit': item.homeOwnerToVisit,
         'Purpose of Visit': item.purposeOfVisit,
       })),
-    [currentItems],
+    [filteredLogs],
   );
 
   return (
