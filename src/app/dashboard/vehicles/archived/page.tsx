@@ -14,20 +14,17 @@ import { db } from '@/firebase';
 
 import { onValue, ref } from 'firebase/database';
 import {
+  ArchiveX,
   ChevronLeft,
   ChevronRight,
   ChevronsLeft,
   ChevronsRight,
-  Edit2,
   Loader2,
-  Trash2,
 } from 'lucide-react';
 import { useEffect, useMemo, useState } from 'react';
-import CreateVehicleForm from './_components/create-vehicle-form';
 import { format } from 'date-fns';
-import EditVehicleForm from './_components/edit-vehicle-form';
-import DeleteVehicle from './_components/delete-vehicle';
 import { Input } from '@/components/ui/input';
+import UnarchiveVehicle from './_components/unarchive';
 
 interface RegisteredVehiclesType {
   id: string;
@@ -41,20 +38,17 @@ interface RegisteredVehiclesType {
   isActive: boolean;
 }
 
-export default function VehicleRegistrationsPage() {
+export default function ArchivedRegistrationPage() {
   const [registeredVehicles, setRegisteredVehicles] = useState<
     RegisteredVehiclesType[]
   >([]);
   const [loading, setLoading] = useState(true);
-  const [openCreate, setOpenCreate] = useState(false);
-  const [openEdit, setOpenEdit] = useState(false);
-  const [openDelete, setOpenDelete] = useState(false);
-  const [selectedEditVehicle, setSelectedEditVehicle] = useState(
+
+  const [openUnarchive, setOpenUnarchive] = useState(false);
+  const [selectedUnarchived, setSelectedUnArchive] = useState(
     {} as RegisteredVehiclesType,
   );
-  const [selectedDeleteVehicle, setSelectedDeleteVehicle] = useState(
-    {} as RegisteredVehiclesType,
-  );
+
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(8); // Adjust as needed
   const [searchTermName, setSearchTermName] = useState('');
@@ -84,19 +78,9 @@ export default function VehicleRegistrationsPage() {
   }, []);
 
   const activeVehicles = useMemo(
-    () => registeredVehicles?.filter((v) => v.isActive),
+    () => registeredVehicles?.filter((v) => !v.isActive),
     [registeredVehicles],
   );
-
-  const selectEditVehicle = (vehicle: RegisteredVehiclesType) => {
-    setSelectedEditVehicle(vehicle);
-    setOpenEdit(true);
-  };
-
-  const selectDeleteVehicle = (vehicle: RegisteredVehiclesType) => {
-    setSelectedDeleteVehicle(vehicle);
-    setOpenDelete(true);
-  };
 
   // Logic to paginate data
   const indexOfLastItem = currentPage * itemsPerPage;
@@ -118,21 +102,17 @@ export default function VehicleRegistrationsPage() {
 
   const totalPages = Math.ceil(filteredLogs.length / itemsPerPage);
 
+  const selectUnarchive = (vehicle: RegisteredVehiclesType) => {
+    setSelectedUnArchive(vehicle);
+    setOpenUnarchive(true);
+  };
+
   return (
     <>
-      <CreateVehicleForm
-        open={openCreate}
-        onClose={() => setOpenCreate(false)}
-      />
-      <EditVehicleForm
-        open={openEdit}
-        onClose={() => setOpenEdit(false)}
-        vehicle={selectedEditVehicle}
-      />
-      <DeleteVehicle
-        open={openDelete}
-        onClose={() => setOpenDelete(false)}
-        vehicle={selectedDeleteVehicle}
+      <UnarchiveVehicle
+        open={openUnarchive}
+        onClose={() => setOpenUnarchive(false)}
+        vehicle={selectedUnarchived}
       />
       <div className='w-full h-full'>
         {loading ? (
@@ -141,30 +121,25 @@ export default function VehicleRegistrationsPage() {
           </div>
         ) : (
           <div className='w-full h-full flex flex-col gap-2'>
-            <div className='flex justify-between'>
-              <div className='flex gap-2'>
-                <Input
-                  placeholder='Search by name'
-                  value={searchTermName}
-                  onChange={(e) => setSearchTermName(e.target.value)}
-                  className='max-w-[340px]'
-                />
-                <Input
-                  placeholder='Search by plate number'
-                  value={searchTermPlateNumber}
-                  onChange={(e) => setSearchTermPlateNumber(e.target.value)}
-                  className='max-w-[340px]'
-                />
-                <Input
-                  placeholder='Search by payment name'
-                  value={searchTermPaymentName}
-                  onChange={(e) => setSearchTermPaymentName(e.target.value)}
-                  className='max-w-[340px]'
-                />
-              </div>
-              <Button onClick={() => setOpenCreate(true)}>
-                Register New Car
-              </Button>
+            <div className='flex gap-2'>
+              <Input
+                placeholder='Search by name'
+                value={searchTermName}
+                onChange={(e) => setSearchTermName(e.target.value)}
+                className='max-w-[340px]'
+              />
+              <Input
+                placeholder='Search by plate number'
+                value={searchTermPlateNumber}
+                onChange={(e) => setSearchTermPlateNumber(e.target.value)}
+                className='max-w-[340px]'
+              />
+              <Input
+                placeholder='Search by payment name'
+                value={searchTermPaymentName}
+                onChange={(e) => setSearchTermPaymentName(e.target.value)}
+                className='max-w-[340px]'
+              />
             </div>
             <div className='flex-grow'>
               <Table>
@@ -195,18 +170,12 @@ export default function VehicleRegistrationsPage() {
                       <TableCell>
                         {format(vehicle.dateRegistered, 'P')}
                       </TableCell>
-                      <TableCell className='space-x-2'>
+                      <TableCell>
                         <Button
-                          onClick={() => selectEditVehicle(vehicle)}
                           size='icon'
-                          variant='outline'>
-                          <Edit2 className='w-4 h-4' />
-                        </Button>
-                        <Button
-                          onClick={() => selectDeleteVehicle(vehicle)}
-                          size='icon'
-                          variant='destructive'>
-                          <Trash2 className='w-4 h-4' />
+                          variant='outline'
+                          onClick={() => selectUnarchive(vehicle)}>
+                          <ArchiveX className='w-4 h-4' />
                         </Button>
                       </TableCell>
                     </TableRow>

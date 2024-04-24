@@ -2,6 +2,7 @@
 import { Button } from '@/components/ui/button';
 import Image from 'next/image';
 import {
+  Archive,
   BookText,
   CarFront,
   LayoutDashboard,
@@ -28,6 +29,7 @@ export default function Sidebar({ name, email, role }: UserType) {
   const router = useRouter();
 
   const handleLogout = async () => {
+    localStorage.removeItem('role');
     await signOut(auth);
 
     await fetch('/api/logout');
@@ -86,6 +88,20 @@ export default function Sidebar({ name, email, role }: UserType) {
               }>
               <Link href='/dashboard/vehicles/registrations'>
                 <CarFront className='mr-2 h-4 w-4' /> Registrations
+              </Link>
+            </Button>
+          )}
+          {role === 'ADMIN' && (
+            <Button
+              className='justify-start'
+              asChild
+              variant={
+                pathname === '/dashboard/vehicles/archived'
+                  ? 'outline'
+                  : 'ghost'
+              }>
+              <Link href='/dashboard/vehicles/archived'>
+                <Archive className='mr-2 h-4 w-4' /> Archived
               </Link>
             </Button>
           )}
