@@ -41,7 +41,8 @@ export default function VehicleLogsPage() {
   const [loading, setLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(8); // Adjust as needed
-  const [searchTerm, setSearchTerm] = useState('');
+  const [searchTermName, setSearchTermName] = useState('');
+  const [searchTermPlateNumber, setSearchTermPlateNumber] = useState('');
   const [timeInDate, setTimeInDate] = useState<DateRange | undefined>({
     from: undefined,
     to: undefined,
@@ -118,7 +119,13 @@ export default function VehicleLogsPage() {
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
 
   const filteredLogs = combinedLogs
-    .filter((log) => log.name.toLowerCase().includes(searchTerm.toLowerCase()))
+    .filter(
+      (log) =>
+        log.name.toLowerCase().includes(searchTermName.toLowerCase()) &&
+        log['Plate Number']
+          .toLowerCase()
+          .includes(searchTermPlateNumber.toLowerCase()),
+    )
     .filter((log) => {
       if (!timeInDate?.from || !timeInDate.to) return true;
       return (
@@ -164,9 +171,15 @@ export default function VehicleLogsPage() {
             <div className='flex items-center gap-4'>
               <Input
                 placeholder='Search by name'
+                value={searchTermName}
+                onChange={(e) => setSearchTermName(e.target.value)}
                 className='max-w-[340px]'
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
+              />
+              <Input
+                placeholder='Search by plate number'
+                value={searchTermPlateNumber}
+                onChange={(e) => setSearchTermPlateNumber(e.target.value)}
+                className='max-w-[340px]'
               />
               <DateRangePicker
                 placeholder='Pick a time in date'
