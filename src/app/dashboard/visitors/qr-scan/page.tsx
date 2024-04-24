@@ -115,7 +115,9 @@ export default function QRScanPage() {
             <ul className='list-disc ml-5'>
               <li>Name: {results.name}</li>
               <li>Address: {results.address}</li>
-              <li>Contact Number: {results.contactNum}</li>
+              <li>Contact number: {results.contactNum}</li>
+              <li>Homeowner to visit: {results.homeOwnerToVisit}</li>
+              <li>Purpose of visit: {results.purposeOfVisit}</li>
             </ul>
             <RadioGroup
               onValueChange={(value) => setTimeType(value)}
