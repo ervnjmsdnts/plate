@@ -51,6 +51,8 @@ export default function VisitorsLogsPage() {
     to: undefined,
   });
 
+  const role = localStorage.getItem('role');
+
   useEffect(() => {
     const query = ref(db, 'Visitor Logs');
     const unsubscribe = onValue(query, (snapshot) => {
@@ -142,11 +144,13 @@ export default function VisitorsLogsPage() {
                 setDate={setTimeOutDate}
               />
             </div>
-            <Button asChild>
-              <CSVLink data={csvData} filename='visitor-logs.csv'>
-                Export CSV
-              </CSVLink>
-            </Button>
+            {role === 'ADMIN' && (
+              <Button asChild>
+                <CSVLink data={csvData} filename='visitor-logs.csv'>
+                  Export CSV
+                </CSVLink>
+              </Button>
+            )}
           </div>
           <div className='flex-grow'>
             <Table>

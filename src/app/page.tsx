@@ -10,15 +10,17 @@ import {
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { useToast } from '@/components/ui/use-toast';
-import { auth } from '@/firebase';
+import { auth, db } from '@/firebase';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { signInWithEmailAndPassword } from 'firebase/auth';
+import { child, get, ref } from 'firebase/database';
 import { Loader2 } from 'lucide-react';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
+import { UserType } from './dashboard/types';
 
 const schema = z.object({
   email: z
@@ -30,6 +32,22 @@ const schema = z.object({
 });
 
 type Schema = z.infer<typeof schema>;
+
+function parseJwt(token: string) {
+  var base64Url = token.split('.')[1];
+  var base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+  var jsonPayload = decodeURIComponent(
+    window
+      .atob(base64)
+      .split('')
+      .map(function (c) {
+        return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+      })
+      .join(''),
+  );
+
+  return JSON.parse(jsonPayload);
+}
 
 export default function HomePage() {
   const [isLoading, setIsLoading] = useState(false);
@@ -52,6 +70,14 @@ export default function HomePage() {
           Authorization: `Bearer ${idToken}`,
         },
       });
+
+      const tokenData = parseJwt(idToken);
+
+      const user = await get(child(ref(db), 'Users/' + tokenData.user_id));
+
+      const userData = user.val() as UserType;
+
+      localStorage.setItem('role', userData.role);
 
       router.refresh();
     } catch (_) {
