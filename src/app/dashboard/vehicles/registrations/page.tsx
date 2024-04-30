@@ -14,6 +14,7 @@ import { db } from '@/firebase';
 
 import { onValue, ref } from 'firebase/database';
 import {
+  Archive,
   ChevronLeft,
   ChevronRight,
   ChevronsLeft,
@@ -206,7 +207,7 @@ export default function VehicleRegistrationsPage() {
                           onClick={() => selectDeleteVehicle(vehicle)}
                           size='icon'
                           variant='destructive'>
-                          <Trash2 className='w-4 h-4' />
+                          <Archive className='w-4 h-4' />
                         </Button>
                       </TableCell>
                     </TableRow>
