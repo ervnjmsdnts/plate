@@ -32,7 +32,7 @@ interface VehicleLogsType {
   'Plate Number': string;
   'Vehicle ID': string;
   id: string;
-  name: string;
+  name: string | null;
 }
 
 export default function VehicleLogsPage() {
@@ -103,14 +103,13 @@ export default function VehicleLogsPage() {
 
   const combinedLogs = useMemo(
     () =>
-      vehicleLogs
-        .map((item) => {
-          const correspondingItem = registeredLogs.find(
-            (element) => element.id === item['Vehicle ID'],
-          );
-          return { ...item, name: correspondingItem?.name };
-        })
-        .filter((item) => item.name),
+      vehicleLogs.map((item) => {
+        const correspondingItem = registeredLogs.find(
+          (element) => element.id === item['Vehicle ID'],
+        );
+        return { ...item, name: correspondingItem?.name };
+      }),
+    // .filter((item) => item.name),
     [vehicleLogs, registeredLogs],
   );
 
@@ -119,13 +118,22 @@ export default function VehicleLogsPage() {
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
 
   const filteredLogs = combinedLogs
-    .filter(
-      (log) =>
-        log.name.toLowerCase().includes(searchTermName.toLowerCase()) &&
-        log['Plate Number']
+    .filter((log) => {
+      if (searchTermName && log.name) {
+        return (
+          log.name.toLowerCase().includes(searchTermName.toLowerCase()) &&
+          log['Plate Number']
+            .toLowerCase()
+            .includes(searchTermPlateNumber.toLowerCase())
+        );
+      } else if (!searchTermName) {
+        return log['Plate Number']
           .toLowerCase()
-          .includes(searchTermPlateNumber.toLowerCase()),
-    )
+          .includes(searchTermPlateNumber.toLowerCase());
+      } else {
+        return false;
+      }
+    })
     .filter((log) => {
       if (!timeInDate?.from || !timeInDate.to) return true;
       return (
@@ -221,7 +229,7 @@ export default function VehicleLogsPage() {
                       {log?.Exit ? format(log?.Exit, 'Ppp') : ''}
                     </TableCell>
                     <TableCell className='font-medium'>{log.name}</TableCell>
-                    <TableCell>{log.Category}</TableCell>
+                    <TableCell>{log.Category.toUpperCase()}</TableCell>
                     <TableCell>{log['Plate Number']}</TableCell>
                   </TableRow>
                 ))}
