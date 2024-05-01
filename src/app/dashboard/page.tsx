@@ -18,6 +18,7 @@ function LoadingCard() {
 }
 
 async function TotalRegisteredVehicles() {
+  unstable_noStore();
   const dbRef = ref(db);
   const registeredVehicles = await get(child(dbRef, 'Registered Vehicles'));
 
@@ -38,6 +39,7 @@ async function TotalRegisteredVehicles() {
   );
 }
 async function TotalVehicleLogs() {
+  unstable_noStore();
   const dbRef = ref(db);
   const registeredVehicles = await get(child(dbRef, 'Vehicle Logs'));
 
@@ -57,6 +59,7 @@ async function TotalVehicleLogs() {
 }
 
 async function TotalVisitorLogs() {
+  unstable_noStore();
   const dbRef = ref(db);
   const registeredVehicles = await get(child(dbRef, 'Visitor Logs'));
 
@@ -76,8 +79,6 @@ async function TotalVisitorLogs() {
 }
 
 export default async function DashboardPage() {
-  unstable_noStore();
-
   return (
     <div>
       <div className='grid grid-cols-3 gap-4'>
