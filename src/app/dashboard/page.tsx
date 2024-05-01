@@ -2,6 +2,7 @@ import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { db } from '@/firebase';
 import { child, get, ref } from 'firebase/database';
 import { CarFront, NotepadText } from 'lucide-react';
+import { unstable_noStore } from 'next/cache';
 import { headers } from 'next/headers';
 import { Suspense } from 'react';
 
@@ -75,7 +76,7 @@ async function TotalVisitorLogs() {
 }
 
 export default async function DashboardPage() {
-  headers();
+  unstable_noStore();
 
   return (
     <div>
